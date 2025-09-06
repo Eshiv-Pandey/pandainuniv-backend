@@ -3,6 +3,7 @@ const router = express.Router();
 const path = require("path");
 const fs = require("fs");
 
+// Path to combined.json
 const dataPath = path.join(__dirname, "..", "data", "combined.json");
 
 // Utility to load data from combined.json
@@ -19,37 +20,31 @@ router.get("/", (req, res) => {
     const programsByUniversity = {};
     const uniSet = new Set();
 
-    for (const item of list) {
+    list.forEach((item) => {
       const uni = String(item.university || "").trim();
       const prog = String(item.program || "").trim();
 
-      if (!uni) continue; // skip if no university name
+      if (!uni) return; // skip if no university name
 
       uniSet.add(uni);
 
-      if (!programsByUniversity[uni]) {
-        programsByUniversity[uni] = new Set();
-      }
-
-      if (prog) {
-        programsByUniversity[uni].add(prog);
-      }
-    }
+      if (!programsByUniversity[uni]) programsByUniversity[uni] = new Set();
+      if (prog) programsByUniversity[uni].add(prog);
+    });
 
     const result = {
-      universities: Array.from(uniSet), // keep natural order
+      universities: Array.from(uniSet), // natural order
       programsByUniversity: Object.fromEntries(
         Object.entries(programsByUniversity).map(([u, set]) => [
           u,
-          Array.from(set).sort(), // still sort programs alphabetically
+          Array.from(set).sort(), // sort programs alphabetically
         ])
       ),
     };
-    
 
     res.json(result);
-  } catch (e) {
-    console.error("Universities route error:", e);
+  } catch (err) {
+    console.error("Universities route error:", err);
     res.status(500).json({ error: "Failed to load universities data" });
   }
 });
@@ -59,25 +54,21 @@ router.get("/", (req, res) => {
 router.get("/programs", (req, res) => {
   try {
     const { university } = req.query;
-    if (!university) {
-      return res.status(400).json({ error: "University name is required" });
-    }
+    if (!university) return res.status(400).json({ error: "University name is required" });
 
     const list = loadData();
     const programs = new Set();
 
-    for (const item of list) {
+    list.forEach((item) => {
       const uni = String(item.university || "").trim();
       const prog = String(item.program || "").trim();
 
-      if (uni === university.trim() && prog) {
-        programs.add(prog);
-      }
-    }
+      if (uni === university.trim() && prog) programs.add(prog);
+    });
 
     res.json(Array.from(programs).sort());
-  } catch (e) {
-    console.error("Programs route error:", e);
+  } catch (err) {
+    console.error("Programs route error:", err);
     res.status(500).json({ error: "Failed to load programs data" });
   }
 });
