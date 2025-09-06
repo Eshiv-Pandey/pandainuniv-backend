@@ -15,6 +15,9 @@ const applicationRoutes = require("./routes/applicationRoutes");
 const userRoutes = require("./routes/userRoutes");
 const universitiesRoutes = require("./routes/universitiesRoutes");
 
+app.get("/", (req, res) => {
+    res.send("Backend is running ✅");
+  });
 app.use("/api/applications", applicationRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/universities", universitiesRoutes);
