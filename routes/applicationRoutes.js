@@ -4,20 +4,21 @@ const {
   createApplication,
   getApplicationsByUser,
   getAllApplications,
-  getApplicationsByUniversity
+  getApplicationsByUniversity,
 } = require("../models/applicationsDynamo");
 
-// Submit a new application
+// POST /api/applications
 router.post("/", async (req, res) => {
   try {
-    const userId = req.user?.id || "test-user-123"; // fallback for testing
     const data = req.body;
+    const userId = data.email || "anonymous"; // Ensure userId exists
+
     const newApplication = await createApplication(data, userId);
 
     res.status(201).json({
       success: true,
       message: "Application submitted successfully",
-      application: newApplication
+      application: newApplication,
     });
   } catch (err) {
     console.error("Error creating application:", err);
@@ -25,12 +26,11 @@ router.post("/", async (req, res) => {
   }
 });
 
-// Get all applications submitted by the logged-in user
+// GET /api/applications/my-applications?userId=...
 router.get("/my-applications", async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.query.userId || "anonymous";
     const apps = await getApplicationsByUser(userId);
-
     res.status(200).json({ success: true, applications: apps });
   } catch (err) {
     console.error("Error fetching user applications:", err);
@@ -38,7 +38,7 @@ router.get("/my-applications", async (req, res) => {
   }
 });
 
-// Get all applications
+// GET /api/applications
 router.get("/", async (req, res) => {
   try {
     const apps = await getAllApplications();
@@ -49,12 +49,11 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Get applications for a specific university
+// GET /api/applications/university/:university
 router.get("/university/:university", async (req, res) => {
   try {
     const university = req.params.university;
     const apps = await getApplicationsByUniversity(university);
-
     res.status(200).json({ success: true, applications: apps });
   } catch (err) {
     console.error("Error fetching university applications:", err);
