@@ -1,5 +1,4 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const path = require("path");
@@ -21,13 +20,6 @@ app.get("/", (req, res) => {
 app.use("/api/applications", applicationRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/universities", universitiesRoutes);
-
-mongoose.connect(process.env.MONGO_URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    })
-    .then(() => console.log("✅ MongoDB connected"))
-    .catch(err => console.log("❌ DB error:", err));
 
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
