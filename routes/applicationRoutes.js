@@ -88,4 +88,29 @@ router.get("/university/:university", async (req, res) => {
   }
 });
 
+// POST /api/applications/submit
+router.post("/submit", async (req, res) => {
+  try {
+    const data = req.body;
+    const userId = "test-user-123"; // replace with real auth
+    const newApp = await createApplication(data, userId);
+    res.status(201).json({ success: true, application: newApp });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: "Failed to submit application" });
+  }
+});
+
+// GET /api/applications/all
+router.get("/all", async (req, res) => {
+  try {
+    const apps = await getAllApplications();
+    res.status(200).json({ success: true, applications: apps });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: "Failed to fetch applications" });
+  }
+});
+
+
 module.exports = router;
